@@ -1,10 +1,9 @@
 # import the dataset
 
-
 import sqlite3
 import pandas as pd
 
-# Connect to the SQLite database
+# Connect to the database
 conn = sqlite3.connect('data/us_pres_climate_speeches_final.db')
 cursor = conn.cursor() # Create a cursor object
 
@@ -12,7 +11,7 @@ cursor = conn.cursor() # Create a cursor object
 query = f'SELECT * FROM {'us_pres_climate_speeches_final'};'
 cursor.execute(query)
 
-# Fetch all the data and store it in a pandas DataFrame
+# Store it in a DataFrame
 df_speeches = pd.read_sql_query(query, conn)
 
 conn.close()
@@ -20,7 +19,7 @@ conn.close()
 # Convert column names to lowercase
 df_speeches.columns = [col.lower() for col in df_speeches.columns] 
 
-# Create a variable with party
+# Create a map speaker/party
 party_mapping = {
     'George W. Bush': 'Republican',
     'Barack Obama': 'Democratic',
@@ -35,7 +34,7 @@ df_speeches['party'] = df_speeches['speaker'].map(party_mapping)
 # Convert the 'date' column to datetime
 df_speeches['date'] = pd.to_datetime(df_speeches['date'], format='%d/%m/%Y')
 
-# Tidying data
+# Tidy data
 from nltk.corpus import stopwords
 
 
