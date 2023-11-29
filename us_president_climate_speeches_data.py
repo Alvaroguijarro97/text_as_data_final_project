@@ -311,7 +311,7 @@ for link in filtered_biden_links_2:
         
 #Actually scraping speeches with BeautifulSoup
 
-api_key = '4c7f9ea80d0e29d71c0940ec64af2e10'
+api_key = 'TBD'
 
 def getHTMLdocument(url):
     # Construct the API URL with your API key and the target URL
