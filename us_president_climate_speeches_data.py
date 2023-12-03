@@ -311,7 +311,7 @@ for link in filtered_biden_links_2:
         
 #Actually scraping speeches with BeautifulSoup
 
-api_key = 'TBD'
+api_key = 'Fill in with your information'
 
 def getHTMLdocument(url):
     # Construct the API URL with your API key and the target URL
@@ -637,20 +637,44 @@ us_pres_climate_speeches['Text'] = us_pres_climate_speeches['Text'].str.replace(
 
 
 # Some rows are individual sentences, let's merge those into one row where applicable so each row is an entire "Speech"
-us_pres_climate_speeches_final = us_pres_climate_speeches.groupby(['Title', 'Date']).agg({'Text': ' '.join}).reset_index()
+us_pres_climate_speeches_final = us_pres_climate_speeches.groupby(['Title', 'Date']).agg({
+    'URL': 'first',  # Keeps the first URL in each group
+    'Speaker': 'first',  # Keeps the first Speaker in each group
+    'Text': ' '.join  # Concatenates all Text entries in each group
+}).reset_index()
+
+# Copying dataframe in case this doesn't work lol
+us_pres_climate_speeches_final_copy = us_pres_climate_speeches_final.copy()
+
+# Making sure these speeches have enough of a climate focus
+def check_keywords(text, keywords):
+    # Count how many keywords are in the text
+    count = sum(word.lower() in text.lower() for word in keywords)
+    # Return True if 3 or more keywords are found, False otherwise
+    return count >= 3
+
+# Apply the function to each row in the DataFrame
+us_pres_climate_speeches_final_copy['Contains_Keywords'] = us_pres_climate_speeches_final_copy['Text'].apply(lambda text: check_keywords(text, climate_keywords))
+
+# Filter out rows where 'Contains_Keywords' is False
+us_pres_climate_speeches_final_copy = us_pres_climate_speeches_final_copy[us_pres_climate_speeches_final_copy['Contains_Keywords'] == True]
+
+# Drop the 'Contains_Keywords' column
+us_pres_climate_speeches_final_copy = us_pres_climate_speeches_final_copy.drop(columns=['Contains_Keywords'])
+
 
 
 # let's save this as a CSV and SQLite database so we don't lose it
 
-us_pres_climate_speeches_final.to_csv('us_pres_climate_speeches.csv', index=False)  
+us_pres_climate_speeches_final_copy.to_csv('us_pres_climate_speeches_2.csv', index=False)  
 
 import sqlite3
 
 # Connect to the SQLite database
 # If the database does not exist, it will be created
-conn = sqlite3.connect('us_pres_climate_speeches.db')
+conn = sqlite3.connect('us_pres_climate_speeches_more_climate.db')
 
-us_pres_climate_speeches_final.to_sql('us_pres_climate_speeches', conn, if_exists='replace', index=False)
+us_pres_climate_speeches_final_copy.to_sql('us_pres_climate_speeches_more_climate', conn, if_exists='replace', index=False)
 
 conn.close()
 
