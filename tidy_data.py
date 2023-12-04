@@ -1,7 +1,10 @@
 # import the dataset
 
 import sqlite3
+
 import pandas as pd
+
+
 import re
 
 # Connect to the database
