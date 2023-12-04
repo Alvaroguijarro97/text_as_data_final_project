@@ -6,13 +6,16 @@ import pandas as pd
 
 
 import re
+import nltk
+nltk.download('stopwords')
+nltk.download('punkt')
 
 # Connect to the database
 conn = sqlite3.connect('data/us_pres_climate_speeches_more_climate.db')
 cursor = conn.cursor() # Create a cursor object
 
 # Select all data from the table
-query = f'SELECT * FROM {'us_pres_climate_speeches_more_climate'};'
+query = f'SELECT * FROM us_pres_climate_speeches_more_climate;'
 cursor.execute(query)
 
 # create a DataFrame
